@@ -13,7 +13,7 @@ A small FastAPI/PostgreSQL service, React dashboard, and outbound-polling MQL5 a
 - **Service operators:** [create your Telegram bot and deploy the backend](docs/telegram-setup.md).
 - **Download:** [EA source ZIP](https://github.com/ChronoVortex07/anchor-mt5-risk/releases/download/v0.1.0-alpha.1/anchor-mt5-ea-source.zip) · [checksums](https://github.com/ChronoVortex07/anchor-mt5-risk/releases/download/v0.1.0-alpha.1/SHA256SUMS.txt) · [prerelease notes](https://github.com/ChronoVortex07/anchor-mt5-risk/releases/tag/v0.1.0-alpha.1).
 
-Maintainer bot: [@cv_mt5_bot](https://t.me/cv_mt5_bot). Its bot identity is created; public webhook activation is pending HTTPS deployment.
+Maintainer bot: [@cv_mt5_bot](https://t.me/cv_mt5_bot). Its webhook is configured at [mt5.chronovortex.dev](https://mt5.chronovortex.dev). Open the bot and send `/link` to begin demo-account setup.
 
 There is no universal hosted deployment bundled with this repository. Get the actual `https://t.me/<bot_username>` and HTTPS API URL from your operator, or create your own using the setup guide. The registration utility prints your real bot link after verifying its identity. The ZIP contains all EA sources and includes, **not** an unverified precompiled EX5.
 

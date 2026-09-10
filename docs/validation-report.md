@@ -53,4 +53,4 @@ The open-source repository and EA source archive are distributed separately from
 - Expanded PostgreSQL suite: **65 tests passed** (initial 51 plus Telegram setup and EA archive checks).
 - Setup helper verifies bot identity, supports non-mutating checks and preserves queued updates unless explicitly told to discard them.
 - EA source packaging is deterministic, includes all MQL5 dependencies/license/install instructions, and excludes credentials, local journals and compiled binaries.
-- The `cv_mt5_bot` identity was verified against Telegram; public webhook activation is a separate deployment step. Credentials are excluded from the public repository.
+- The `cv_mt5_bot` identity was verified against Telegram and its webhook registered at `https://mt5.chronovortex.dev/v1/telegram/webhook`. Telegram reported zero pending updates and no delivery error at activation. Public `/healthz` and `/readyz` returned HTTP 200; unauthenticated webhook and agent poll submissions returned HTTP 401. This validates deployment and authentication boundaries, not a real-user Telegram-to-MT5 execution. Credentials are excluded from the public repository.

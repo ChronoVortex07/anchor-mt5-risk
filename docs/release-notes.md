@@ -19,4 +19,4 @@ Download **anchor-mt5-ea-source.zip** and **SHA256SUMS.txt** below. Extract the 
 - [Demo checklist](https://github.com/ChronoVortex07/anchor-mt5-risk/blob/main/docs/demo-checklist.md)
 - [Remaining risks](https://github.com/ChronoVortex07/anchor-mt5-risk/blob/main/docs/remaining-risks.md)
 
-The maintainer bot is [@cv_mt5_bot](https://t.me/cv_mt5_bot). Its public webhook requires HTTPS deployment; a source download alone does not activate a hosted service. Self-hosters create their own bot using the operator guide.
+The maintainer bot is [@cv_mt5_bot](https://t.me/cv_mt5_bot). Its webhook is configured at [mt5.chronovortex.dev](https://mt5.chronovortex.dev); open the bot and send `/link` to begin demo-account setup. Self-hosters create their own bot using the operator guide.

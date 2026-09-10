@@ -6,7 +6,7 @@ This prerelease provides source code. Its EA has **not yet been compiled or demo
 
 ## 1. Open your operator's Telegram bot
 
-Maintainer bot: [@cv_mt5_bot](https://t.me/cv_mt5_bot). Its service address is `https://mt5.chronovortex.dev`. Public webhook activation is pending completion of the Cloudflare route; the bot can answer once that setup is complete.
+Maintainer bot: [@cv_mt5_bot](https://t.me/cv_mt5_bot). Its service address is `https://mt5.chronovortex.dev`. The Telegram webhook is configured. Open the bot and send `/link` to begin pairing.
 
 Open the exact `https://t.me/<bot_username>` link supplied by your operator. Press **Start**, then send:
 
