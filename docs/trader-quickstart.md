@@ -6,7 +6,7 @@ This prerelease provides source code. Its EA has **not yet been compiled or demo
 
 ## 1. Open your operator's Telegram bot
 
-Maintainer bot: [@cv_mt5_bot](https://t.me/cv_mt5_bot). The initial bot identity is available, but its webhook must be activated on the public HTTPS service before it can answer.
+Maintainer bot: [@cv_mt5_bot](https://t.me/cv_mt5_bot). Its service address is `https://mt5.chronovortex.dev`. Public webhook activation is pending completion of the Cloudflare route; the bot can answer once that setup is complete.
 
 Open the exact `https://t.me/<bot_username>` link supplied by your operator. Press **Start**, then send:
 
@@ -49,7 +49,7 @@ For upgrades, stop the old EA and reconcile any pending operation before replaci
 
 ## 4. Allow HTTPS and configure the EA
 
-In **Tools → Options → Expert Advisors**, enable **Allow WebRequest for listed URL** and add your operator's origin, for example `https://risk.example.com`. Use the real URL returned by `/link`. See [MT5's official platform settings](https://www.metatrader5.com/en/terminal/help/startworking/settings).
+In **Tools → Options → Expert Advisors**, enable **Allow WebRequest for listed URL** and add your operator's origin, for the maintainer service, `https://mt5.chronovortex.dev`. Use the real URL returned by `/link`. See [MT5's official platform settings](https://www.metatrader5.com/en/terminal/help/startworking/settings).
 
 EA Inputs:
 

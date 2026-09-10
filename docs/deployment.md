@@ -28,6 +28,23 @@ Start with `docker compose --env-file .env -p mt5-risk-stage -f infra/compose.ya
 
 Caddy overwrites untrusted forwarding headers. Uvicorn is configured to trust its forwarding headers because production backend access is restricted to the proxy network. Do not publish backend directly to the Internet. A hostile peer on a shared edge network can forge client IP headers; isolate the network if that assumption is unacceptable.
 
+## Cloudflare Tunnel with the edge overlay
+
+When the existing `cloudflared` connector is attached to the same Docker `edge` network, it can route directly to the backend:
+
+| Cloudflare published application field | Value |
+|---|---|
+| Public hostname | Your chosen hostname, such as `mt5.chronovortex.dev` |
+| Path | Leave blank |
+| Service type | **HTTP** |
+| Service URL | **`mt5-risk-api:8080`** |
+
+The public URL remains **HTTPS**. HTTP here describes the private Docker connection from the tunnel connector to the backend. No host port is published. Cloudflare documents this [HTTPS-to-HTTP proxy behavior](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/routing-to-tunnel/protocols/).
+
+Set `PUBLIC_URL=https://<your-hostname>` in `.env`, then recreate the backend with both Compose files. Keep the same Compose project name when applying the overlay to an existing deployment so its database volume is preserved.
+
+Do not require an interactive Cloudflare Access login for this hostname: Telegram and MT5 cannot complete it. If a wildcard Access application covers the domain, configure an exception scoped to this exact hostname; preserve protections on other hostnames. The app uses its own Telegram login, webhook secret and agent tokens. Avoid browser challenges and cache overrides on API routes. Verify `/healthz` returns JSON over public HTTPS before registering the webhook. For dashboard sign-in, set the exact hostname through BotFather `/setdomain`.
+
 ## Standalone small VPS
 
 1. Install Docker Engine/Compose; configure key-only SSH and disable password/root login after verifying your key works. Configure OS security updates and reliable time synchronization.
