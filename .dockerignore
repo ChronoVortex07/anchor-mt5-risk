@@ -1,0 +1,14 @@
+.git
+.venv
+.tools
+.env
+.env.*
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+frontend/node_modules
+frontend/dist
+backend/*.egg-info
+backups
+frontend/test-results
+frontend/playwright-report

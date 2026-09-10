@@ -1,0 +1,48 @@
+name: checks
+permissions:
+  contents: read
+on: [push, pull_request]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-bookworm
+        env:
+          POSTGRES_USER: risk
+          POSTGRES_PASSWORD: test-only
+          POSTGRES_DB: risk_test
+        ports: ["55439:5432"]
+        options: >-
+          --health-cmd "pg_isready -U risk -d risk_test"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: pip install -r backend/requirements.lock && pip install --no-deps -e backend
+      - run: ruff check --config backend/pyproject.toml backend tools
+      - run: ruff format --check --config backend/pyproject.toml backend tools
+      - run: alembic upgrade head && alembic check
+        working-directory: backend
+        env:
+          DATABASE_URL: postgresql+psycopg://risk:test-only@127.0.0.1:55439/risk_test
+      - run: pytest backend/tests
+        env:
+          TEST_DATABASE_URL: postgresql+psycopg://risk:test-only@127.0.0.1:55439/risk_test
+      - run: npm ci --prefix frontend && npm run format:check --prefix frontend && npm run build --prefix frontend
+      - run: npx playwright install --with-deps chromium
+        working-directory: frontend
+      - run: docker compose -f infra/compose.yaml up -d --build --wait
+        env:
+          POSTGRES_PASSWORD: ci-disposable-password
+      - run: npm test --prefix frontend
+      - run: bash -n tools/backup.sh tools/restore_test.sh
+      - run: python tools/package_ea.py --output build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: anchor-mt5-ea-source
+          path: build/
+          if-no-files-found: error

@@ -1,0 +1,12 @@
+{
+	email {$ACME_EMAIL}
+}
+{$PUBLIC_HOST} {
+	encode zstd gzip
+	header Strict-Transport-Security "max-age=31536000; includeSubDomains"
+	request_body {
+		max_size 64KB
+	}
+	reverse_proxy backend:8080
+	# Access logs deliberately disabled: Telegram login redirects include signed query fields.
+}

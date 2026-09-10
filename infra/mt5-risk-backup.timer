@@ -1,0 +1,8 @@
+[Unit]
+Description=Daily MT5 Risk backup
+[Timer]
+OnCalendar=*-*-* 03:20:00 UTC
+RandomizedDelaySec=900
+Persistent=true
+[Install]
+WantedBy=timers.target

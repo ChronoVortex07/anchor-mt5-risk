@@ -1,0 +1,26 @@
+# Standalone VPS. On this shared host use compose.edge.yaml and the existing Caddy.
+name: mt5-risk-prod
+services:
+  backend:
+    ports: !reset []
+  caddy:
+    image: caddy:2-alpine@sha256:5f5c8640aae01df9654968d946d8f1a56c497f1dd5c5cda4cf95ab7c14d58648
+    restart: unless-stopped
+    environment:
+      PUBLIC_HOST: ${PUBLIC_HOST:?Set public hostname}
+      ACME_EMAIL: ${ACME_EMAIL:?Set certificate email}
+    ports: ["${PUBLIC_BIND:-0.0.0.0}:80:80", "${PUBLIC_BIND:-0.0.0.0}:443:443"]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      backend: {condition: service_healthy}
+    networks: [private]
+    security_opt: [no-new-privileges:true]
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+volumes:
+  caddy-data:
+  caddy-config:

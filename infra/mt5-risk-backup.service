@@ -1,0 +1,9 @@
+[Unit]
+Description=MT5 Risk encrypted offsite PostgreSQL backup
+After=docker.service
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/mt5-risk-backup.env
+ExecStart=/opt/mt5-risk/tools/backup.sh
+UMask=0077
+Nice=10

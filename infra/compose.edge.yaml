@@ -1,0 +1,11 @@
+# Existing Caddy gateway integration. No host ports and no edge mutation.
+services:
+  backend:
+    ports: !reset []
+    networks:
+      private:
+      edge:
+        aliases: [mt5-risk-api]
+networks:
+  edge:
+    external: true
