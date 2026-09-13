@@ -7,6 +7,8 @@ from zipfile import ZipFile
 import pytest
 from app.config import Settings
 from package_ea import ROOT, package
+from package_local_panel import INCLUDES
+from package_local_panel import package as package_local_panel
 from pydantic import SecretStr
 from register_webhook import configure, validate_config
 
@@ -97,10 +99,35 @@ def test_ea_archive_complete_reproducible_and_source_only(tmp_path):
         expected = {
             "MQL5/Experts/AnchorRisk/" + p.relative_to(ROOT / "mt5").as_posix()
             for p in (ROOT / "mt5").rglob("*")
-            if p.suffix in (".mq5", ".mqh")
+            if p.suffix in (".mq5", ".mqh") and p.name != "LocalRiskPanel.mq5"
         }
         assert expected.issubset(names)
+        assert not any(name.endswith("LocalRiskPanel.mq5") for name in names)
         assert {"LICENSE", "README.txt", "INSTALLATION.md", "DEMO-CHECKLIST.md"}.issubset(names)
         assert not any(name.endswith((".ex5", ".env", ".json", ".log")) for name in names)
         assert all(not name.startswith("/") and ".." not in name.split("/") for name in names)
         assert "SOURCE, not a precompiled .ex5" in bundle.read("README.txt").decode()
+
+
+def test_local_panel_archive_is_separate_reproducible_and_source_only(tmp_path):
+    archive, checksum = package_local_panel(tmp_path / "first")
+    other, _ = package_local_panel(tmp_path / "second")
+    assert archive.read_bytes() == other.read_bytes()
+    assert hashlib.sha256(archive.read_bytes()).hexdigest() in checksum.read_text()
+    with ZipFile(archive) as bundle:
+        names = bundle.namelist()
+        assert "MQL5/Experts/AnchorLocal/LocalRiskPanel.mq5" in names
+        assert "MQL5/Experts/AnchorLocal/BreakEvenAgent.mq5" not in names
+        assert {
+            f"MQL5/Experts/AnchorLocal/Include/RiskAgent/{filename}" for filename in INCLUDES
+        }.issubset(names)
+        assert {"LICENSE", "README.txt", "LOCAL-PANEL.md"}.issubset(names)
+        assert not any(name.endswith((".ex5", ".env", ".json", ".log")) for name in names)
+        assert all(not name.startswith("/") and ".." not in name.split("/") for name in names)
+        assert "does not use Telegram" in bundle.read("README.txt").decode()
+        source = bundle.read("MQL5/Experts/AnchorLocal/LocalRiskPanel.mq5").decode()
+        assert "void OnChartEvent" in source
+        assert "ExecutionEnabled=false" in source
+        assert "AllowLiveAccount=false" in source
+        assert "BuildResult(command,current" in source
+        assert "WebRequest" not in source and "/v1/" not in source

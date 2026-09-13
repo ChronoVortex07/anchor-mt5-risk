@@ -34,7 +34,12 @@ def package(output: Path, root: Path = ROOT) -> tuple[Path, Path]:
         raise ValueError("Run from a complete source checkout with its license")
     entries = {"README.txt": INSTALL.encode(), "LICENSE": (root / "LICENSE").read_bytes()}
     for source in sorted((root / "mt5").rglob("*")):
-        if source.is_file() and not source.is_symlink() and source.suffix in (".mq5", ".mqh"):
+        if (
+            source.is_file()
+            and not source.is_symlink()
+            and source.suffix in (".mq5", ".mqh")
+            and source.name != "LocalRiskPanel.mq5"
+        ):
             name = "MQL5/Experts/AnchorRisk/" + source.relative_to(root / "mt5").as_posix()
             entries[name] = source.read_bytes()
     entries["INSTALLATION.md"] = (root / "docs/mt5-installation.md").read_bytes()

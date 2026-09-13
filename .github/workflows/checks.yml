@@ -40,9 +40,15 @@ jobs:
           POSTGRES_PASSWORD: ci-disposable-password
       - run: npm test --prefix frontend
       - run: bash -n tools/backup.sh tools/restore_test.sh
-      - run: python tools/package_ea.py --output build
+      - run: python tools/package_ea.py --output build/remote
       - uses: actions/upload-artifact@v4
         with:
           name: anchor-mt5-ea-source
-          path: build/
+          path: build/remote/
+          if-no-files-found: error
+      - run: python tools/package_local_panel.py --output build/local
+      - uses: actions/upload-artifact@v4
+        with:
+          name: anchor-local-risk-panel-source
+          path: build/local/
           if-no-files-found: error

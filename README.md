@@ -31,6 +31,17 @@ Omitted percentage means **100%**. `all` also means 100%. Percentages must satis
 
 `gold` must be mapped to an exact broker symbol in the account dashboard. Without a mapping, identifiers are treated literally: no fuzzy matching, suffix guessing or default gold substitution. BE protects whole tickets, counts existing protection, and may overshoot a target because positions differ in size. It never closes a ticket merely to hit the BE percentage. BE+ is a stop-price buffer estimate, not a guarantee of a non-negative fill.
 
+## Local-only panel alternative
+
+[`LocalRiskPanel.mq5`](mt5/LocalRiskPanel.mq5) is an experimental native MT5
+panel for traders who do not need remote Telegram control. It operates on the
+current chart symbol and reuses the same planner/executor, while requiring no
+backend, database, account pairing, dashboard or WebRequest permission. See the
+[local panel guide](docs/local-panel.md). The remote service and
+`BreakEvenAgent` remain available and unchanged. Build its deterministic source
+ZIP with `python tools/package_local_panel.py --output build`; CI also publishes
+it as the `anchor-local-risk-panel-source` workflow artifact.
+
 ## Start on Linux
 
 Prerequisites: Docker Engine and Compose v2.24.4+ (overlay reset support).
