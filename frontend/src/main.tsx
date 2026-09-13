@@ -43,6 +43,17 @@ async function api(path: string, init?: RequestInit) {
   return response.json();
 }
 function App() {
+  type View = "overview" | "accounts" | "activity";
+  const readView = (): View => {
+    const hash = window.location.hash.slice(1);
+    return hash === "accounts" || hash === "activity" ? hash : "overview";
+  };
+  const [view, setView] = useState<View>(readView);
+  useEffect(() => {
+    const changed = () => setView(readView());
+    window.addEventListener("hashchange", changed);
+    return () => window.removeEventListener("hashchange", changed);
+  }, []);
   const [accounts, setAccounts] = useState<Account[]>([]),
     [history, setHistory] = useState<Operation[]>([]);
   const [logged, setLogged] = useState(false),
@@ -102,6 +113,7 @@ function App() {
         script.src = "https://telegram.org/js/telegram-widget.js?22";
         script.setAttribute("data-telegram-login", config.bot_username);
         script.setAttribute("data-size", "large");
+        script.setAttribute("data-radius", "20");
         script.setAttribute("data-auth-url", window.location.origin + "/");
         script.async = true;
         loginRef.current.replaceChildren(script);
@@ -133,29 +145,42 @@ function App() {
         </a>
         <div className="workspace">MT5 RISK CONTROL</div>
         <nav>
-          <a href="#overview" className="active">
-            ◫ <span>Overview</span>
-          </a>
-          <a href="#accounts">
-            ▤ <span>Accounts</span>
-          </a>
-          <a href="#activity">
-            ↳ <span>Activity</span>
-          </a>
+          {(["overview", "accounts", "activity"] as const).map((item) => (
+            <a
+              key={item}
+              href={`#${item}`}
+              className={view === item ? "active" : ""}
+              aria-current={view === item ? "page" : undefined}
+            >
+              <span>
+                {item === "overview"
+                  ? "Overview"
+                  : item === "accounts"
+                    ? "Accounts"
+                    : "Activity"}
+              </span>
+            </a>
+          ))}
         </nav>
         <div className="sidebar-note">
           <span className="small-dot" /> Risk reduction only
           <p>Trade controls live in your Telegram conversation.</p>
         </div>
       </aside>
-      <main id="overview">
+      <main>
         <header>
           <span className="eyebrow">YOUR TRADING WORKSPACE</span>
           <span className="pill">MVP · Protocol 1</span>
         </header>
         <div className="title-row">
           <div>
-            <h1>Stay in control.</h1>
+            <h1>
+              {view === "overview"
+                ? "Stay in control."
+                : view === "accounts"
+                  ? "Your accounts."
+                  : "Your activity."}
+            </h1>
             <p className="subtitle">
               A clear view of your accounts, protection requests, and outcomes.
             </p>
@@ -174,9 +199,17 @@ function App() {
           <section className="welcome">
             <div className="eyebrow">CONNECTED TO YOU. EXECUTED IN MT5.</div>
             <h2>
-              Your terminal.
-              <br />
-              Your control.
+              {view === "overview" ? (
+                <>
+                  Your terminal.
+                  <br />
+                  Your control.
+                </>
+              ) : view === "accounts" ? (
+                "Sign in to view your accounts"
+              ) : (
+                "Sign in to view your activity"
+              )}
             </h2>
             <p>
               Pair an agent with <code>/link</code> in Telegram, then sign in
@@ -194,6 +227,19 @@ function App() {
               </div>
             )}
             <div ref={loginRef} />
+            <details className="login-help">
+              <summary>Telegram sign-in not working?</summary>
+              <p>
+                If Telegram shows “Bot domain invalid”, the bot owner should
+                open the @BotFather mini app, select
+                <code> @{distribution?.bot_username || "your bot"} </code>, then
+                Login Widget and check Allowed URLs includes
+                <code> {window.location.origin}</code>. Reload after saving. If
+                the error persists, contact the operator to check widget
+                compatibility. Dashboard sign-in is separate from MT5 agent
+                pairing.
+              </p>
+            </details>
             <p className="muted">
               {loading
                 ? "Loading…"
@@ -202,7 +248,7 @@ function App() {
           </section>
         ) : (
           <>
-            <div className="stats">
+            <div className="stats" hidden={view !== "overview"}>
               <section>
                 <span>Connected accounts</span>
                 <strong>{accounts.length.toString().padStart(2, "0")}</strong>
@@ -222,7 +268,7 @@ function App() {
                 <small>Preview and execution tracked separately</small>
               </section>
             </div>
-            <section id="accounts" className="section">
+            <section className="section" hidden={view === "activity"}>
               <div className="section-heading">
                 <h2>
                   Your accounts <span>{accounts.length}</span>
@@ -396,7 +442,7 @@ function App() {
                 </button>
               </section>
             )}
-            <section id="activity" className="section">
+            <section className="section" hidden={view === "accounts"}>
               <div className="section-heading">
                 <h2>Recent activity</h2>
                 <p>Requested → planned → confirmed</p>

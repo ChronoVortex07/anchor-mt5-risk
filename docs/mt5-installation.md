@@ -1,6 +1,6 @@
 # MT5 installation and compilation
 
-For the ready-to-extract ZIP and beginner steps, see [the trader quickstart](trader-quickstart.md) and [download the source prerelease](https://github.com/ChronoVortex07/anchor-mt5-risk/releases/tag/v0.1.0-alpha.1).
+For the ready-to-extract ZIP and beginner steps, see [the trader quickstart](trader-quickstart.md) and [download the source prerelease](https://github.com/ChronoVortex07/anchor-mt5-risk/releases/tag/v0.1.0-alpha.2).
 
 Use a Windows MT5 terminal logged into a **demo hedging account**. Linux hosts the backend; the EA runs inside the user's own MT5. Never enter broker credentials in this service.
 
@@ -44,3 +44,27 @@ The API generates the authentication secret. The EA-generated UUID is only a col
 ## Broker limitations
 
 Hedging only. At most 128 matching symbol positions per plan. Quote freshness uses MT5 server time and requires a recent quote. Close supports FOK/IOC; symbols requiring another fill mode fail closed. A position larger than the broker's maximum per-deal volume may only be partially reduced in one command. BE normalizes to tick size in the protective direction, respects stop/freeze distances, preserves TP, checks broker retcode and re-reads the final position. Close requires a broker exit-deal record; delayed deal visibility is classified UNCERTAIN. Commission/swap are not included in the price-buffer estimate.
+
+## Connection troubleshooting
+
+`Pairing failed. HTTP -1` means MT5 did not receive an HTTP response. It does not mean the server rejected the pairing code. EA version 0.11 reports `WEBREQUEST_FAILED` with MT5's numeric error; share that line without credentials.
+
+1. Set **ApiUrl** in EA Inputs to the origin supplied by `/link`. For the maintainer bot this is **https://mt5.chronovortex.dev**. The source's `api.example.com` placeholder is not a working service.
+2. Add the same origin to **Tools → Options → Expert Advisors → Allow WebRequest for listed URL**, with the checkbox enabled. The Inputs setting and terminal permission are both required.
+3. Attach directly to a chart in a logged-in demo terminal. Network requests do not work in Strategy Tester.
+4. Verify the origin's `/healthz` URL from the same Windows computer. A browser success alone does not verify MT5 permissions or rule out an interactive Cloudflare challenge.
+5. Obtain a fresh `/link` code after fixing the settings. If the first request may have succeeded but lost its response, check the account in the dashboard before re-pairing. Never delete an unresolved execution journal.
+
+| Diagnostic | Meaning / next check |
+|---|---|
+| MQL 4014 | Function not permitted: check WebRequest allowlist and runtime context |
+| MQL 5200 | Invalid URL: check ApiUrl |
+| MQL 5201 | Connection failed: check Internet, DNS, proxy and TLS |
+| MQL 5202 | Timeout: pairing may have reached the server; inspect account state |
+| HTTP 401 + INVALID_PAIRING_CODE | Server rejected an expired, used or incorrect pairing code |
+| HTTP 422 | Request format rejected; check full code and logged-in MT5 account |
+| HTTP redirect or 403 | Operator should inspect Cloudflare Access/challenge settings |
+
+See [MetaQuotes WebRequest error documentation](https://www.mql5.com/en/book/advanced/network/network_http). Pairing uses a bounded five-second timeout; regular polling retains its two-second timeout. Errors never log credentials or full response bodies.
+
+Dashboard **Bot domain invalid** is a separate Telegram widget setting. The bot owner should open the BotFather mini app → matching bot → Login Widget → Allowed URLs, register the HTTPS origin (for the maintainer: `https://mt5.chronovortex.dev`) and root redirect, then reload the site. If rejection persists, the operator must verify legacy-widget compatibility. It cannot be fixed with an EA pairing code.

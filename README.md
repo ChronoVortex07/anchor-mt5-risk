@@ -11,7 +11,7 @@ A small FastAPI/PostgreSQL service, React dashboard, and outbound-polling MQL5 a
 
 - **Traders:** [open the bot, download and configure the MT5 EA](docs/trader-quickstart.md).
 - **Service operators:** [create your Telegram bot and deploy the backend](docs/telegram-setup.md).
-- **Download:** [EA source ZIP](https://github.com/ChronoVortex07/anchor-mt5-risk/releases/download/v0.1.0-alpha.1/anchor-mt5-ea-source.zip) · [checksums](https://github.com/ChronoVortex07/anchor-mt5-risk/releases/download/v0.1.0-alpha.1/SHA256SUMS.txt) · [prerelease notes](https://github.com/ChronoVortex07/anchor-mt5-risk/releases/tag/v0.1.0-alpha.1).
+- **Download:** [EA source ZIP](https://github.com/ChronoVortex07/anchor-mt5-risk/releases/download/v0.1.0-alpha.2/anchor-mt5-ea-source.zip) · [checksums](https://github.com/ChronoVortex07/anchor-mt5-risk/releases/download/v0.1.0-alpha.2/SHA256SUMS.txt) · [prerelease notes](https://github.com/ChronoVortex07/anchor-mt5-risk/releases/tag/v0.1.0-alpha.2).
 
 Maintainer bot: [@cv_mt5_bot](https://t.me/cv_mt5_bot). Its webhook is configured at [mt5.chronovortex.dev](https://mt5.chronovortex.dev). Open the bot and send `/link` to begin demo-account setup.
 
@@ -49,7 +49,7 @@ Keep `.env`, agent credentials, pairing codes and local execution journals priva
 
 ## Pair an MT5 demo account
 
-1. Follow [Telegram service setup](docs/telegram-setup.md); run `python -m tools.register_webhook --drop-pending-updates` inside the backend image after setting its environment. Configure the bot's web login domain using BotFather `/setdomain`.
+1. Follow [Telegram service setup](docs/telegram-setup.md); run `python -m tools.register_webhook --drop-pending-updates` inside the backend image after setting its environment. Configure the website URL in the BotFather mini app → your bot → Login Widget → Allowed URLs; see the setup guide.
 2. Send `/link` in a **private** Telegram conversation. Code format: `XXXX-XXXX-XXXX`, expires in 10 minutes.
 3. Install [BreakEvenAgent.mq5](mt5/BreakEvenAgent.mq5) with its includes. Set `ApiUrl`, `PairingCode`, `ExecutionEnabled=false`, and allow the HTTPS URL in MT5 WebRequest settings.
 4. Sign into the dashboard using the same Telegram identity. Add `gold → your exact broker symbol`. Choose an account via dashboard or `/link` inline buttons.

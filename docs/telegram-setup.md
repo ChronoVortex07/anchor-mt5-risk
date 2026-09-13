@@ -9,7 +9,7 @@ This guide is for the **service operator**. Traders use [the trader quickstart](
 3. BotFather returns an API token. Save it in a password manager and the server's protected `.env` file. **Do not send it to traders, put it in Git, or include it in screenshots.**
 4. Record the bot's actual username without `@`. Its access link is `https://t.me/<your_bot_username>`.
 5. In BotFather, use `/setjoingroups` to disable adding it to groups. Anchor only accepts private-chat control messages.
-6. Once your hostname is chosen, use `/setdomain`, select the bot, and enter that hostname (for example `risk.example.com`) to enable dashboard Telegram sign-in.
+6. Open the **@BotFather mini app → your bot → Login Widget → Allowed URLs** and add your exact HTTPS origin, for example `https://risk.example.com`, and root redirect `https://risk.example.com/`. For the maintainer service, use `https://mt5.chronovortex.dev`. Telegram now documents this configuration in its [current login guide](https://core.telegram.org/bots/telegram-login). The `/setdomain` command may only return documentation in current BotFather versions.
 
 Telegram requires this owner interaction; the application cannot create a BotFather identity for you. See [Telegram's official bot tutorial](https://core.telegram.org/bots/tutorial).
 
@@ -98,7 +98,7 @@ Share **only** these public items with traders: the actual bot link, your HTTPS 
 | Bot does not answer `/link` | Confirm private chat, correct bot, successful webhook setup, public HTTPS readiness and backend logs. |
 | Setup says username mismatch | `TELEGRAM_BOT_USERNAME` must match the bot that issued the token; omit `@`. |
 | Webhook shows delivery errors/pending updates | Check DNS/certificate, proxy forwarding, endpoint access and webhook secret. Recreate backend after changing `.env`, then re-register. |
-| Dashboard Login Widget fails | Set BotFather `/setdomain` to the exact dashboard hostname; use HTTPS and the same Telegram account. |
+| Dashboard Login Widget fails | Check BotFather mini app → Login Widget → Allowed URLs contains the exact HTTPS dashboard origin; reload. If rejection persists, check legacy-widget compatibility with the operator. |
 | EA WebRequest fails | Add the exact origin to MT5's allowed WebRequest list; check certificate and network access. |
 | `EXECUTION_DISABLED` | Expected until explicitly enabled locally after demo validation. |
 | `AGENT_OFFLINE` | MT5 desktop must stay running and connected. Installing the mobile app alone cannot run the EA. |
@@ -112,3 +112,7 @@ docker compose --env-file .env -p mt5-risk-prod -f infra/compose.yaml logs --tai
 ```
 
 Before operating publicly, configure [encrypted offsite backups and restore tests](backup-restore.md). See [remaining risks](remaining-risks.md) and the [operations runbook](operations-runbook.md) for rotation/recovery.
+
+### Login widget versions
+
+This prerelease currently uses Telegram's legacy `telegram-widget.js` iframe and signed-field verification. Telegram's newer Login library uses OIDC ID tokens and different verification; these cannot be interchanged by pasting a new embed snippet. The current BotFather setup uses the mini app and Allowed URLs. On the maintainer deployment, saving Allowed URLs resolved the domain rejection and the legacy login button rendered successfully. A completed real-user sign-in remains a separate validation step. Never put a Telegram Login Client Secret into the browser, bot chat or public repository.

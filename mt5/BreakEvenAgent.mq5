@@ -1,5 +1,5 @@
 #property strict
-#property version "0.10"
+#property version "0.11"
 #property description "Telegram risk agent: hedging BE+ / bounded gross-volume close. Demo validation required."
 #include "Include/RiskAgent/Protocol.mqh"
 #include "Include/RiskAgent/HttpClient.mqh"
@@ -23,7 +23,7 @@ int Backoff=1000;
 string Api="";
 
 string BaseState() {
-   return "\"protocol_version\":1,\"session_id\":"+Q(BootID)+",\"installation_id\":"+Q(Installation)+",\"ea_version\":\"0.10\",\"account\":"+AccountJSON();
+   return "\"protocol_version\":1,\"session_id\":"+Q(BootID)+",\"installation_id\":"+Q(Installation)+",\"ea_version\":\"0.11\",\"account\":"+AccountJSON();
 }
 bool Journal(string state,string id,string result,bool execution) {
    return SaveFileText("journal.json","{\"state\":"+Q(state)+",\"id\":"+Q(id)+",\"execution\":"+B(execution)+",\"result\":"+Q(result)+"}");
@@ -39,10 +39,22 @@ bool LoadCredentials() {
    return true;
 }
 bool PairAgent() {
-   if(PairingCode=="") return false;
+   if(PairingCode=="") { Print("PAIRING_CODE_REQUIRED: send /link to the bot, then enter the code in EA Inputs."); return false; }
    string response;
-   int status=PostJSON(Api,"/v1/agent/pair","{"+BaseState()+",\"pairing_code\":"+Q(PairingCode)+"}","","",response);
-   if(status!=200) { Print("Pairing failed. HTTP ",status,". If response was lost, revoke in dashboard and use a new code."); return false; }
+   int status=PostJSON(Api,"/v1/agent/pair","{"+BaseState()+",\"pairing_code\":"+Q(PairingCode)+"}","","",response,5000);
+   if(status!=200) {
+      Print("Pairing failed. HTTP ",status,". A transport failure is not proof that the pairing code was invalid.");
+      Json error;
+      if(error.Parse(response)) {
+         string code=error.Str(0,"detail");
+         // Only known codes are logged: never echo arbitrary server bodies or credentials.
+         if(code=="INVALID_PAIRING_CODE" || code=="ACCOUNT_ALREADY_BOUND" || code=="REVOKE_EXISTING_AGENT_FIRST" ||
+            code=="RECONCILIATION_REQUIRED" || code=="INSTALLATION_ALREADY_PAIRED") Print("Pairing reason: ",code);
+      }
+      if(status==422) Print("Pairing format rejected. Copy the complete code exactly and check MT5 has a logged-in account.");
+      Print("If the response was lost, check the dashboard before re-pairing. Never delete an unresolved journal.");
+      return false;
+   }
    Json j; if(!j.Parse(response) || j.Num(0,"protocol_version")!=1) return false;
    string id=j.Str(0,"agent_id"),secret=j.Str(0,"agent_secret");
    if(!UUIDValid(id) || StringLen(secret)!=43) return false;
@@ -54,9 +66,13 @@ bool PairAgent() {
    AgentID=id; AgentSecret=secret; Print("Agent paired. ExecutionEnabled=",ExecutionEnabled); return true;
 }
 int OnInit() {
-   Api=ApiUrl; while(StringLen(Api)>0 && StringSubstr(Api,StringLen(Api)-1)=="/") Api=StringSubstr(Api,0,StringLen(Api)-1);
+   Api=ApiUrl; StringTrimLeft(Api); StringTrimRight(Api); while(StringLen(Api)>0 && StringSubstr(Api,StringLen(Api)-1)=="/") Api=StringSubstr(Api,0,StringLen(Api)-1);
    if(StringFind(Api,"https://")!=0 || StringFind(Api,"@")>=0 || StringFind(Api,"?")>=0 || StringFind(Api,"#")>=0 ||
       StringFind(Api,"\r")>=0 || StringFind(Api,"\n")>=0 || BEBufferPoints<0 || BEBufferPoints>10000 || MaxDeviationPoints<0 || MaxDeviationPoints>1000) return INIT_PARAMETERS_INCORRECT;
+   if(Api=="https://api.example.com" || StringFind(Api,"/",8)>=0) {
+      Print("API_URL_REQUIRED: set ApiUrl to the HTTPS origin supplied by /link (for the maintainer: https://mt5.chronovortex.dev), without an endpoint path.");
+      return INIT_PARAMETERS_INCORRECT;
+   }
    FolderCreate("RiskAgent");
    // Exclusive local file lock. Multiple charts in this terminal cannot execute concurrently.
    LockHandle=FileOpen(StorePrefix+"instance.lock",FILE_WRITE|FILE_BIN);

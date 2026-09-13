@@ -68,3 +68,50 @@ for (const viewport of [
       fullPage: true,
     });
   });
+
+test("signed-out navigation explains the selected protected view", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByRole("link", { name: "Accounts", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Sign in to view your accounts" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Accounts", exact: true }),
+  ).toHaveAttribute("aria-current", "page");
+  await page.getByRole("link", { name: "Activity", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Sign in to view your activity" }),
+  ).toBeVisible();
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: "Sign in to view your activity" }),
+  ).toBeVisible();
+  await page
+    .getByText("Telegram sign-in not working?", { exact: true })
+    .click();
+  await expect(page.getByText(/If Telegram shows/)).toBeVisible();
+});
+
+test("authenticated navigation switches account and activity views", async ({
+  page,
+}) => {
+  await page.route("**/v1/web/accounts", (r) => r.fulfill({ json: [account] }));
+  await page.route("**/v1/web/history", (r) => r.fulfill({ json: [] }));
+  await page.goto("/");
+  await page.getByRole("link", { name: "Activity", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Recent activity" }),
+  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Demo Gold" })).toBeHidden();
+  await page.getByRole("link", { name: "Accounts", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Demo Gold" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Recent activity" }),
+  ).toBeHidden();
+  await page.goBack();
+  await expect(
+    page.getByRole("heading", { name: "Recent activity" }),
+  ).toBeVisible();
+});

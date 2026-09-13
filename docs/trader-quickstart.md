@@ -18,9 +18,9 @@ The bot replies with a one-use pairing code, valid for ten minutes, the HTTPS AP
 
 ## 2. Download the Expert Advisor
 
-- [Download the EA source ZIP](https://github.com/ChronoVortex07/anchor-mt5-risk/releases/download/v0.1.0-alpha.1/anchor-mt5-ea-source.zip).
-- [Download SHA256SUMS.txt](https://github.com/ChronoVortex07/anchor-mt5-risk/releases/download/v0.1.0-alpha.1/SHA256SUMS.txt).
-- [Read the prerelease notes](https://github.com/ChronoVortex07/anchor-mt5-risk/releases/tag/v0.1.0-alpha.1).
+- [Download the EA source ZIP](https://github.com/ChronoVortex07/anchor-mt5-risk/releases/download/v0.1.0-alpha.2/anchor-mt5-ea-source.zip).
+- [Download SHA256SUMS.txt](https://github.com/ChronoVortex07/anchor-mt5-risk/releases/download/v0.1.0-alpha.2/SHA256SUMS.txt).
+- [Read the prerelease notes](https://github.com/ChronoVortex07/anchor-mt5-risk/releases/tag/v0.1.0-alpha.2).
 
 The ZIP includes **all** `.mq5`/`.mqh` sources under `MQL5/Experts/AnchorRisk/`, plus the license and installation/checklist documents. It intentionally contains no `.ex5` executable because compilation has not been verified. Do not download only the main `.mq5` file; its include files are required.
 

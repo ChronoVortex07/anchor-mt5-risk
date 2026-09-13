@@ -1,4 +1,7 @@
 :root {
+  color-scheme: light;
+}
+:root {
   font-family:
     Inter,
     ui-sans-serif,
@@ -471,6 +474,10 @@ td small {
 }
 .welcome iframe {
   margin: 16px 0;
+  color-scheme: light;
+  border: 0;
+  border-radius: 20px;
+  background: transparent;
 }
 footer {
   display: flex;
@@ -612,4 +619,15 @@ footer {
 }
 .onboarding-links a:hover {
   background: white;
+}
+
+[hidden] {
+  display: none !important;
+}
+.login-help {
+  margin-top: 20px;
+  max-width: 600px;
+}
+.login-help summary {
+  cursor: pointer;
 }

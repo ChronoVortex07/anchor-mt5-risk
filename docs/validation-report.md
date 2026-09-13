@@ -54,3 +54,13 @@ The open-source repository and EA source archive are distributed separately from
 - Setup helper verifies bot identity, supports non-mutating checks and preserves queued updates unless explicitly told to discard them.
 - EA source packaging is deterministic, includes all MQL5 dependencies/license/install instructions, and excludes credentials, local journals and compiled binaries.
 - The `cv_mt5_bot` identity was verified against Telegram and its webhook registered at `https://mt5.chronovortex.dev/v1/telegram/webhook`. Telegram reported zero pending updates and no delivery error at activation. Public `/healthz` and `/readyz` returned HTTP 200; unauthenticated webhook and agent poll submissions returned HTTP 401. This validates deployment and authentication boundaries, not a real-user Telegram-to-MT5 execution. Credentials are excluded from the public repository.
+
+## Connection follow-up — 2026-09-13
+
+- Public `/healthz` returned HTTP 200. An empty POST to `/v1/agent/pair` reached backend validation and returned HTTP 422; no real pairing code was consumed by the probe.
+- The user supplied an MT5 `Pairing failed. HTTP -1` log. This establishes a WebRequest failure without an HTTP response, not a rejected pairing code. The original EA omitted `GetLastError()`, so the exact terminal-side cause remains unconfirmed.
+- EA 0.11 now logs the numeric MQL network error and known backend rejection codes. Static review only: MetaEditor and MT5 execution are unavailable here.
+- Dashboard navigation and signed-out instructions were corrected; Telegram's legacy widget remains in use. After updating BotFather Allowed URLs, the user and a browser inspection confirmed the login button renders without the domain error. A completed real-user login remains unverified. No successful dashboard authentication is claimed from mocked browser tests.
+- TypeScript/Vite build, Prettier, Ruff and 14 distribution/setup tests passed. Browser checks cover signed-out navigation, authenticated views with mocked account data, and desktop/mobile layouts.
+
+External browser runs encountered intermittent loading/network errors, including `net::ERR_NETWORK_CHANGED`. The full five-test browser suite passed against the deployed container over its private network; public endpoint probes and both navigation regression cases also passed over HTTPS. This does not certify connectivity from the user's Windows terminal.

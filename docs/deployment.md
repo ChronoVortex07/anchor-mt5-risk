@@ -43,7 +43,7 @@ The public URL remains **HTTPS**. HTTP here describes the private Docker connect
 
 Set `PUBLIC_URL=https://<your-hostname>` in `.env`, then recreate the backend with both Compose files. Keep the same Compose project name when applying the overlay to an existing deployment so its database volume is preserved.
 
-Do not require an interactive Cloudflare Access login for this hostname: Telegram and MT5 cannot complete it. If a wildcard Access application covers the domain, configure an exception scoped to this exact hostname; preserve protections on other hostnames. The app uses its own Telegram login, webhook secret and agent tokens. Avoid browser challenges and cache overrides on API routes. Verify `/healthz` returns JSON over public HTTPS before registering the webhook. For dashboard sign-in, set the exact hostname through BotFather `/setdomain`.
+Do not require an interactive Cloudflare Access login for this hostname: Telegram and MT5 cannot complete it. If a wildcard Access application covers the domain, configure an exception scoped to this exact hostname; preserve protections on other hostnames. The app uses its own Telegram login, webhook secret and agent tokens. Avoid browser challenges and cache overrides on API routes. Verify `/healthz` returns JSON over public HTTPS before registering the webhook. For dashboard sign-in, register the exact HTTPS origin in the BotFather mini app → your bot → Login Widget → Allowed URLs.
 
 ## Standalone small VPS
 
@@ -66,7 +66,7 @@ docker compose --env-file .env -p mt5-risk-prod -f infra/compose.yaml \
   exec backend python -m tools.register_webhook --drop-pending-updates
 ```
 
-The explicit `--drop-pending-updates` option discards historical pending Telegram updates; omit it when reconfiguring if pending updates should be retained. Bot command registration advertises exactly `/link`, `/be`, `/close`. Set the domain for Telegram Login Widget in BotFather using `/setdomain`. Bot/user interactions must be private chats.
+The explicit `--drop-pending-updates` option discards historical pending Telegram updates; omit it when reconfiguring if pending updates should be retained. Bot command registration advertises exactly `/link`, `/be`, `/close`. Register the dashboard HTTPS origin in BotFather mini app → Login Widget → Allowed URLs. Bot/user interactions must be private chats.
 
 6. Install/test the EA on a demo account. Configure and test offsite backups before enabling live operations.
 
