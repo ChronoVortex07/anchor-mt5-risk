@@ -1,17 +1,22 @@
-# Anchor — MT5 Telegram risk management
+# Anchor — MT5 risk controls
 
 [![CI](https://github.com/ChronoVortex07/anchor-mt5-risk/actions/workflows/checks.yml/badge.svg)](https://github.com/ChronoVortex07/anchor-mt5-risk/actions/workflows/checks.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-A small FastAPI/PostgreSQL service, React dashboard, and outbound-polling MQL5 agent for reducing existing hedging-account exposure. Broker credentials remain exclusively in MT5.
+A native local MT5 panel and an optional Telegram/FastAPI service for reducing
+existing hedging-account exposure. Broker credentials remain exclusively in
+MT5.
 
-**Status:** runnable development implementation with PostgreSQL and simulator tests. MQL5 source is supplied but has not been compiled or executed against MT5 in this Linux environment. Keep the EA in preview mode until the demo validation checklist passes. This is not a live-trading readiness sign-off.
+**Status:** source prerelease. The supporting Python/browser checks pass, but
+the MQL5 sources have not been compiled or executed against MT5 in this Linux
+environment. Keep either EA in preview mode until its demo validation checklist
+passes. This is not a live-trading readiness sign-off.
 
-## Get started
+## Choose a version
 
-- **Traders:** [open the bot, download and configure the MT5 EA](docs/trader-quickstart.md).
-- **Service operators:** [create your Telegram bot and deploy the backend](docs/telegram-setup.md).
-- **Download:** [EA source ZIP](https://github.com/ChronoVortex07/anchor-mt5-risk/releases/download/v0.1.0-alpha.2/anchor-mt5-ea-source.zip) · [checksums](https://github.com/ChronoVortex07/anchor-mt5-risk/releases/download/v0.1.0-alpha.2/SHA256SUMS.txt) · [prerelease notes](https://github.com/ChronoVortex07/anchor-mt5-risk/releases/tag/v0.1.0-alpha.2).
+- **Local MT5 panel:** no server or Telegram required. [Setup guide](docs/local-panel.md) · [source ZIP](https://github.com/ChronoVortex07/anchor-mt5-risk/releases/download/v0.2.0-alpha.1/anchor-local-risk-panel-source.zip) · [checksum](https://github.com/ChronoVortex07/anchor-mt5-risk/releases/download/v0.2.0-alpha.1/anchor-local-risk-panel-SHA256SUMS.txt)
+- **Remote Telegram version:** [trader setup](docs/trader-quickstart.md) · [source ZIP](https://github.com/ChronoVortex07/anchor-mt5-risk/releases/download/v0.1.0-alpha.2/anchor-mt5-ea-source.zip) · [checksum](https://github.com/ChronoVortex07/anchor-mt5-risk/releases/download/v0.1.0-alpha.2/SHA256SUMS.txt)
+- **Service operators:** [Telegram/backend deployment guide](docs/telegram-setup.md).
 
 Maintainer bot: [@cv_mt5_bot](https://t.me/cv_mt5_bot). Its webhook is configured at [mt5.chronovortex.dev](https://mt5.chronovortex.dev). Open the bot and send `/link` to begin demo-account setup.
 
@@ -33,14 +38,15 @@ Omitted percentage means **100%**. `all` also means 100%. Percentages must satis
 
 ## Local-only panel alternative
 
-[`LocalRiskPanel.mq5`](mt5/LocalRiskPanel.mq5) is an experimental native MT5
-panel for traders who do not need remote Telegram control. It operates on the
-current chart symbol and reuses the same planner/executor, while requiring no
-backend, database, account pairing, dashboard or WebRequest permission. See the
-[local panel guide](docs/local-panel.md). The remote service and
-`BreakEvenAgent` remain available and unchanged. Build its deterministic source
-ZIP with `python tools/package_local_panel.py --output build`; CI also publishes
-it as the `anchor-local-risk-panel-source` workflow artifact.
+[`LocalRiskPanel.mq5`](mt5/LocalRiskPanel.mq5) is a native MT5 panel for traders
+who do not need remote Telegram control. It operates on the exact current chart
+symbol and reuses the same planner/executor, while requiring no backend,
+database, account pairing, dashboard or WebRequest permission.
+
+[Download v0.2.0-alpha.1](https://github.com/ChronoVortex07/anchor-mt5-risk/releases/tag/v0.2.0-alpha.1)
+and follow the [local panel setup guide](docs/local-panel.md). The remote service
+and `BreakEvenAgent` remain available and unchanged. Developers can reproduce
+the ZIP with `python tools/package_local_panel.py --output build`.
 
 ## Start on Linux
 

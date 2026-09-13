@@ -1,5 +1,5 @@
 #property strict
-#property version "0.10"
+#property version "0.20"
 #property description "Local-only native panel for break-even protection and bounded exposure reduction."
 
 #include "Include/RiskAgent/Executor.mqh"

@@ -1,24 +1,47 @@
-# Anchor v0.1.0-alpha.2
+# Anchor v0.2.0-alpha.1 — local MT5 panel
 
-Connection diagnostics and dashboard navigation fixes.
+This prerelease adds a separate native MT5 interface for traders who do not
+need remote Telegram control. The existing `BreakEvenAgent`, Telegram service,
+dashboard and v0.1 release remain unchanged.
 
-- Accounts and Activity now switch dashboard views and show sign-in requirements when signed out.
-- Sign-in help explains the BotFather domain setting required by Telegram's login widget.
-- EA **0.11** logs the numeric MT5 WebRequest error and known pairing rejection codes, without credentials or raw responses.
-- Invalid placeholder/path API URLs fail with instructions. Pairing uses a bounded five-second timeout; normal polling remains two seconds.
-- Trade planning, execution permissions and risk restrictions are unchanged.
+## Download
 
-## Upgrade and connect
+Download both release assets:
 
-Download **anchor-mt5-ea-source.zip** and **SHA256SUMS.txt**. Remove the old EA from its chart, replace the entire `MQL5/Experts/AnchorRisk` source folder with the ZIP contents and compile `BreakEvenAgent.mq5` in MetaEditor. Preserve `MQL5/Files/RiskAgent` credentials and journals; never delete unresolved execution state.
+- `anchor-local-risk-panel-source.zip`
+- `anchor-local-risk-panel-SHA256SUMS.txt`
 
-Set `ApiUrl=https://mt5.chronovortex.dev` for [@cv_mt5_bot](https://t.me/cv_mt5_bot), and add that same origin to MT5's enabled WebRequest allowlist. Keep `ExecutionEnabled=false`. For an unpaired terminal, obtain a fresh `/link` code and attach the EA directly to a demo chart.
+The ZIP is source-only. Extract its `MQL5` directory into the MT5 data folder,
+compile `MQL5/Experts/AnchorLocal/LocalRiskPanel.mq5` in MetaEditor, and attach
+it to a demo hedging-account chart. Follow the complete
+[local panel installation guide](https://github.com/ChronoVortex07/anchor-mt5-risk/blob/v0.2.0-alpha.1/docs/local-panel.md).
 
-If pairing reports HTTP -1, share the new `WEBREQUEST_FAILED ... MQL error=...` line without secrets. HTTP -1 is a terminal/request failure, not a server rejection of the code.
+## Panel controls
 
-For the dashboard's “Bot domain invalid” error, check BotFather mini app → `cv_mt5_bot` → Login Widget → Allowed URLs includes `https://mt5.chronovortex.dev`. If it persists after saving, legacy-widget compatibility needs verification.
+- Exact current-chart symbol; no symbol mappings or suffix guessing
+- Live BUY/SELL and configured-BE exposure summary
+- 25%, 50% and 100% volume targets
+- BE protection for BUY or SELL positions
+- Worst-cost-first close for BUY, SELL or both sides
+- Expiring preview and explicit confirmation
+- Automatic refreshed preview and second confirmation if the plan changes
+- Ticket-level preview/result logging in MT5's Experts log
 
-**Source only; no EX5 is supplied.** The publisher cannot run MetaEditor or an MT5 demo broker in this environment. Compilation and broker execution remain manual validation requirements.
+The local EA makes no network requests and requires no Telegram bot, server,
+database, credentials, pairing or WebRequest permission.
 
-- [Installation and troubleshooting](https://github.com/ChronoVortex07/anchor-mt5-risk/blob/main/docs/mt5-installation.md)
-- [Demo checklist](https://github.com/ChronoVortex07/anchor-mt5-risk/blob/main/docs/demo-checklist.md)
+## Safety defaults
+
+`ExecutionEnabled=false` provides previews without broker mutation.
+`AllowLiveAccount=false` independently blocks real-money execution. Demo
+execution still requires enabling Algo Trading and all normal MT5 permissions.
+Netting accounts remain unsupported.
+
+## Validation status
+
+Repository CI validates packaging, shared planner fixtures, the Python reference
+model and the unaffected web service. The publisher's Linux environment cannot
+run MetaEditor or connect the EA to an MT5 broker. This release therefore does
+not claim MQL5 compilation, broker compatibility or live-trading readiness.
+Compile it and complete the documented demo checks on every intended broker and
+device before considering live use.
